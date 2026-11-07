@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#131314">
+  <meta name="description" content="CandyMini AI — chat local com personagens e memória.">
+  <title>CandyMini AI</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-row">
+      <div class="brand-mark">✦</div><span>CandyMini</span>
+      <button class="icon-btn mobile-close" id="closeSidebar" aria-label="Fechar menu">×</button>
+    </div>
+    <button class="new-chat" id="newChat"><span>＋</span> Nova conversa</button>
+    <div class="side-label">BIBLIOTECA</div>
+    <button class="side-link active" data-view="chats">▤ <span>Conversas</span></button>
+    <button class="side-link" data-view="characters">♙ <span>Personagens</span></button>
+    <button class="side-link" data-view="memory">✧ <span>Memória</span></button>
+    <div class="side-label history-label">RECENTES</div>
+    <div id="chatList" class="chat-list"></div>
+    <div class="sidebar-bottom">
+      <div class="engine-chip"><span class="status-dot" id="statusDot"></span><span id="engineStatus">IA não carregada</span></div>
+      <button class="side-link" data-view="settings">⚙ <span>Configurações</span></button>
+      <div class="privacy-note">Suas conversas ficam neste navegador.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-toggle" id="openSidebar" aria-label="Abrir menu">☰</button>
+      <div class="top-title">CandyMini <span class="model-pill">LOCAL AI</span></div>
+      <div class="top-actions"><button class="icon-btn" id="newChatTop" title="Nova conversa">＋</button></div>
+    </header>
+
+    <section id="chatView" class="view chat-view">
+      <div class="welcome" id="welcome">
+        <div class="sparkle">✦</div>
+        <h1>Olá! O que vamos criar hoje?</h1>
+        <p>Seu espaço de histórias, personagens e conversas.</p>
+        <div class="quick-prompts">
+          <button data-prompt="Vamos criar um roleplay de fantasia com personagens originais.">✧ Uma aventura de fantasia</button>
+          <button data-prompt="Ajude-me a criar um personagem detalhado, com personalidade, história e jeito de falar.">♙ Criar personagem</button>
+          <button data-prompt="Quero continuar uma cena de roleplay com bastante detalhes e diálogos naturais.">▤ Continuar uma cena</button>
+        </div>
+        <div class="welcome-model" id="welcomeModel">
+          <div class="model-icon">✦</div>
+          <div><b>Ative sua IA local</b><small>Na primeira vez, o modelo será baixado para este dispositivo.</small></div>
+          <button id="loadModelWelcome" class="primary-btn">Carregar IA</button>
+        </div>
+      </div>
+      <div id="messages" class="messages" aria-live="polite"></div>
+      <div class="composer-wrap">
+        <div id="attachmentPreview" class="attachment-preview"></div>
+        <div class="composer">
+          <button class="composer-icon" id="attachBtn" title="Anexar imagem">＋</button>
+          <input type="file" id="imageInput" accept="image/*" hidden>
+          <textarea id="promptInput" rows="1" placeholder="Converse com a CandyMini..." aria-label="Mensagem"></textarea>
+          <button class="send-btn" id="sendBtn" title="Enviar">↑</button>
+        </div>
+        <div class="composer-foot"><span>IA executada no seu navegador · <span id="modelFoot">modelo ainda não carregado</span></span></div>
+      </div>
+    </section>
+
+    <section id="charactersView" class="view panel-view" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">SUA BIBLIOTECA</span><h1>Personagens</h1><p>Crie companheiros para seus roleplays.</p></div><button class="primary-btn" id="addCharacter">＋ Novo personagem</button></div>
+      <div id="characterGrid" class="character-grid"></div>
+    </section>
+
+    <section id="memoryView" class="view panel-view" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">CONTEXTO PERSISTENTE</span><h1>Memória</h1><p>Informações que podem ser incluídas nas próximas conversas.</p></div></div>
+      <div class="settings-card"><label for="memoryText">Memória geral</label><textarea id="memoryText" class="large-textarea" placeholder="Ex.: Preferências de escrita, detalhes recorrentes do universo, relações entre personagens..."></textarea><div class="card-foot"><small>Armazenada somente neste navegador.</small><button class="primary-btn" id="saveMemory">Salvar memória</button></div></div>
+      <div class="settings-card"><label>Memória do chat atual</label><p class="muted">O histórico recente da conversa é enviado ao modelo para manter a continuidade. A memória geral acima é adicionada como contexto.</p></div>
+    </section>
+
+    <section id="settingsView" class="view panel-view" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">PERSONALIZAÇÃO</span><h1>Configurações</h1><p>Controle o modelo e o comportamento da conversa.</p></div></div>
+      <div class="settings-card">
+        <div class="setting-row"><div><b>Modelo de IA</b><p class="muted">Qwen 2.5 · 1.5B · quantizado</p></div><span class="model-pill">WEBGPU</span></div>
+        <div class="setting-row"><div><b>Status</b><p class="muted" id="settingsStatus">Ainda não carregado</p></div><button class="primary-btn" id="loadModelSettings">Carregar IA</button></div>
+        <div class="progress-track"><div id="progressBar"></div></div><small id="progressText" class="muted">Aguardando carregamento.</small>
+        <p class="notice">A primeira inicialização exige internet e pode baixar aproximadamente 1 GB ou mais de arquivos do modelo. Depois, o navegador pode reutilizar o cache. O desempenho depende do WebGPU e da memória disponível no celular.</p>
+      </div>
+      <div class="settings-card">
+        <label for="temperature">Criatividade <span id="tempValue">0,85</span></label><input id="temperature" type="range" min="0.2" max="1.5" step="0.05" value="0.85">
+        <label for="maxTokens">Tamanho máximo da resposta</label><select id="maxTokens"><option value="256">Curta</option><option value="512">Média</option><option value="768" selected>Longa</option><option value="1024">Muito longa (mais lenta)</option></select>
+        <label class="check-row"><input type="checkbox" id="adultMode" checked> Roleplay adulto consensual habilitado</label>
+        <p class="notice">O modo adulto orienta o estilo do roleplay, mas não remove limitações próprias do modelo. Use apenas personagens e situações envolvendo adultos consentindo.</p>
+      </div>
+      <div class="settings-card">
+        <b>Dados locais</b><p class="muted">Conversas, personagens e memória ficam no armazenamento deste navegador.</p>
+        <button class="danger-btn" id="clearData">Apagar todos os dados locais</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="characterDialog" class="modal">
+  <form method="dialog" id="characterForm">
+    <div class="modal-head"><h2 id="dialogTitle">Novo personagem</h2><button class="icon-btn" value="cancel" aria-label="Fechar">×</button></div>
+    <label>Nome<input id="charName" required maxlength="50" placeholder="Nome do personagem"></label>
+    <label>Descrição e aparência<textarea id="charAppearance" rows="2" placeholder="Como ele é?"></textarea></label>
+    <label>Personalidade<textarea id="charPersonality" rows="3" placeholder="Como age, fala e reage?"></textarea></label>
+    <label>História e cenário<textarea id="charScenario" rows="3" placeholder="Contexto, relações e situação inicial..."></textarea></label>
+    <div class="modal-actions"><button class="secondary-btn" value="cancel">Cancelar</button><button class="primary-btn" id="saveCharacter" value="default">Salvar personagem</button></div>
+  </form>
+</dialog>
+<div id="toast" class="toast" role="status"></div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
